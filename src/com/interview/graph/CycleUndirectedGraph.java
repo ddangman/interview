@@ -22,15 +22,23 @@ public class CycleUndirectedGraph<T> {
         DisjointSet disjointSet = new DisjointSet();
         
         for(Vertex<T> vertex : graph.getAllVertex()){
+            // make single set for every vertex
             disjointSet.makeSet(vertex.getId());
         }
         
+        // iterate every edge to find cycle
+        // by the time edge visited = number of vertices,
+        //   a cycle would be found. Thus time complexity
+        //   is limited to number of vertices. O(v)
         for(Edge<T> edge : graph.getAllEdges()){
             long parent1 = disjointSet.findSet(edge.getVertex1().getId());
             long parent2 = disjointSet.findSet(edge.getVertex2().getId());
+            // if both parents belong to same set, 
+            // current edge has created a cycle
             if(parent1 == parent2){
                 return true;
             }
+            // combine disjoined vertices into same set
             disjointSet.union(edge.getVertex1().getId(), edge.getVertex2().getId());
         }
         return false;
@@ -42,6 +50,7 @@ public class CycleUndirectedGraph<T> {
             if(visited.contains(vertex)){
                 continue;
             }
+            // enter recursion until all vertices are explored
             boolean flag = hasCycleDFSUtil(vertex, visited, null);
             if(flag){
                 return true;
@@ -51,21 +60,28 @@ public class CycleUndirectedGraph<T> {
     }
     
     public boolean hasCycleDFSUtil(Vertex<T> vertex, Set<Vertex<T>> visited,Vertex<T> parent){
+        // log vertex as visited
         visited.add(vertex);
         for(Vertex<T> adj : vertex.getAdjacentVertexes()){
+            //prevents returning to previous vertex
             if(adj.equals(parent)){
                 continue;
             }
+            // if visitedSet already contains adjacentVertex,
+            // there is another way to adjacentVertex
             if(visited.contains(adj)){
+                // cycle found
                 return true;
             }
+            // pass currentVertex to prevent adjacentVertex from
+            // revisiting currentVertex
             boolean hasCycle = hasCycleDFSUtil(adj,visited,vertex);
             if(hasCycle){
                 return true;
             }
         }
-        return false;
-    }
+        return false; // depth-first search complete,
+    } // method will be called again if other vertices need to be explored
     
     public static void main(String args[]){
         
