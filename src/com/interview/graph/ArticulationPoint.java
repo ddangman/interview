@@ -40,8 +40,12 @@ public class ArticulationPoint<T> {
         Set<Vertex<T>> visited = new HashSet<>();
         Set<Vertex<T>> articulationPoints = new HashSet<>();
         Vertex<T> startVertex = graph.getAllVertex().iterator().next();
-
+        // count of new vertex visited
         Map<Vertex<T>, Integer> visitedTime = new HashMap<>();
+        // minimum visitedTime of all adjacent vertices
+        // reachable by DFS traversal. When backedge is found in DFS,
+        // lowTime propagates back through recursion so that entire cycle
+        // will have same lowTime
         Map<Vertex<T>, Integer> lowTime = new HashMap<>();
         Map<Vertex<T>, Vertex<T>> parent = new HashMap<>();
 
@@ -49,15 +53,19 @@ public class ArticulationPoint<T> {
         return articulationPoints;
     }
 
+    // depth-first search will not show articulation point when backtracking from cycle
+    // but will register as articulation point if vertex 
+    // has adjacent vertex that does not cycle back
     private void DFS(Set<Vertex<T>> visited,
             Set<Vertex<T>> articulationPoints, Vertex<T> vertex,
             Map<Vertex<T>, Integer> visitedTime,
             Map<Vertex<T>, Integer> lowTime, Map<Vertex<T>, Vertex<T>> parent) {
-        visited.add(vertex);
-        visitedTime.put(vertex, time);
-        lowTime.put(vertex, time);
-        time++;
-        int childCount =0;
+        
+        visited.add(vertex); // newly visited vertex
+        visitedTime.put(vertex, time); // visitedTime = current time
+        lowTime.put(vertex, time); // lowTime = current time
+        time++; // increment time for next newly visited vertex
+        int childCount = 0; // used in articulation point condition 1)
         boolean isArticulationPoint = false;
         for(Vertex<T> adj : vertex.getAdjacentVertexes()){
             //if adj is same as parent then just ignore this vertex.
@@ -67,18 +75,26 @@ public class ArticulationPoint<T> {
             //if adj has not been visited then visit it.
             if(!visited.contains(adj)) {
                 parent.put(adj, vertex);
-                childCount++;
+                childCount++; // increase independent child count
+                // adjacent vertex enters recursion
                 DFS(visited, articulationPoints, adj, visitedTime, lowTime, parent);
 
+                // if lowTime of adjacent is less than visitedTime of current vertex,
+                // a backedge was found ahead and propagated back to current
+                /* when lowTime propagates (cycle) back 
+                 * so that lowTime is equal to visitedTime
+                 * lowTime must have originated from current vertex; 
+                 * therefore, current vertex is an articulation point */
                 if(visitedTime.get(vertex) <= lowTime.get(adj)) {
+                    // articulation point if not root
                     isArticulationPoint = true;
-                } else {
+                } else { // propagate low time of adjacent vertex that just got out of recursion
                     //below operation basically does lowTime[vertex] = min(lowTime[vertex], lowTime[adj]);
                     lowTime.compute(vertex, (currentVertex, time) ->
                         Math.min(time, lowTime.get(adj))
                     );
                 }
-
+              // vertex already visited, current edge is a backedge  
             } else { //if adj is already visited see if you can get better low time.
                 //below operation basically does lowTime[vertex] = min(lowTime[vertex], visitedTime[adj]);
                 lowTime.compute(vertex, (currentVertex, time) ->
@@ -88,7 +104,8 @@ public class ArticulationPoint<T> {
         }
 
         //checks if either condition 1 or condition 2 meets). If yes then it is articulation point.
-        if((parent.get(vertex) == null && childCount >= 2) || parent.get(vertex) != null && isArticulationPoint ) {
+        if((parent.get(vertex) == null && childCount >= 2) 
+                || parent.get(vertex) != null && isArticulationPoint ) {
             articulationPoints.add(vertex);
         }
         
@@ -128,3 +145,4 @@ public class ArticulationPoint<T> {
     }
     
 }
+
