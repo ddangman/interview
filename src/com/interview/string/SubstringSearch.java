@@ -39,19 +39,27 @@ public class SubstringSearch {
      * Time/space complexity is O(size of pattern)
      */
     private int[] computeTemporaryArray(char pattern[]){
+        //lps indicates longest proper prefix which is also same as suffix
+        // at every point
         int [] lps = new int[pattern.length];
-        int index =0;
-        for(int i=1; i < pattern.length;){
+        int index =0; //index of prefix
+        for(int i=1; i < pattern.length;){ //i: index of suffix
             if(pattern[i] == pattern[index]){
+                // track where prefix[index] matches suffix[index]
                 lps[i] = index + 1;
+                // match found, increment both prefix & suffix index
                 index++;
                 i++;
             }else{
                 if(index != 0){
+                    // no match, go to prefix[index] of last matching char
+                    // compare new prefix[index] to current suffix[index]
                     index = lps[index-1];
+                    // do not increment suffix[index] unless prefix[index] is 0
                 }else{
-                    lps[i] =0;
-                    i++;
+                    // no matching prefix string for current suffix
+                    lps[i] =0; // indicates no matching prefix for current suffix
+                    i++; // increment suffix[index] and continue search for matching prefix
                 }
             }
         }
