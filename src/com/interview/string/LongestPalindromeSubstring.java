@@ -4,7 +4,8 @@ package com.interview.string;
  * Date 07/29/2015
  * @author Tushar Roy
  *
- * Given a string find longest palindromic substring in this string.
+ * Manacher's Algorithm
+ * Given a string find longest palindromic substring in this string in linear time.
  *
  * References
  * http://www.geeksforgeeks.org/longest-palindrome-substring-set-1/
@@ -47,15 +48,40 @@ public class LongestPalindromeSubstring {
 
     /**
      * Linear time Manacher's algorithm to find longest palindromic substring.
+     * After a palindrome is found, we can use knowledge of palindromes
+     * and prior calculations to center next palindrome
+     Iterate every char as center of palindrome. Once a palindrome is found,
+     we can skip every char within palindrome unless array shows another palindrome that
+     ends at edge of current palindrome. 
+     Mirror that center around current palindrome's center and try to expand that palindrome.
      * There are 4 cases to handle
-     * Case 1 : Right side palindrome is totally contained under current palindrome. In this case do not consider this as center.
-     * Case 2 : Current palindrome is proper suffix of input. Terminate the loop in this case. No better palindrom will be found on right.
-     * Case 3 : Right side palindrome is proper suffix and its corresponding left side palindrome is proper prefix of current palindrome. Make largest such point as
-     * next center.
-     * Case 4 : Right side palindrome is proper suffix but its left corresponding palindrome is be beyond current palindrome. Do not consider this
-     * as center because it will not extend at all.
+     * Case 1 : Right side mirror palindrome is totally contained under current palindrome. 
+                It can not expand past boundary of current palindrome
+                unless it touches or exceed current palindrome's border.
+                In this case do not consider this as center.
+     * Case 2 : Current palindrome is proper suffix of input. 
+                Terminate the loop in this case. 
+                No better palindrome will be found on right.
+     * Case 3 : Right side palindrome is proper suffix and 
+                its corresponding left side palindrome 
+                is proper prefix of current palindrome. 
+                Meaning current palindrome, minus center char(s)
+                makes 2 other palindromes that touches
+                left and right edge of current palindrome.
+                Since several may exist,
+                make largest such point as next center.
+                Palindrome must touch right edge so it
+                can expand past right edge.
+     * Case 4 : Right side palindrome is proper suffix (fits inside right edge)
+                but its left corresponding palindrome is 
+                beyond current palindrome's left edge
+                If the right palindrome could expand to mirror the left palindrome, 
+                the current palindrome already would have expanded
+                Do not consider this as center because
+                it will not extend at all.
      *
-     * To handle even size palindromes replace input string with one containing $ between every input character and in start and end.
+     * To handle even size palindromes replace input string 
+       with one containing $ between every input character and in start and end.
      */
     public int longestPalindromicSubstringLinear(char input[]) {
         int index = 0;
@@ -103,7 +129,9 @@ public class LongestPalindromeSubstring {
                     break;
                 }
             }
-            //make i as newCenter. Set right and left to atleast the value we already know should be matching based of left side palindrome.
+            //make i as newCenter. 
+            //Set right and left to atleast the value 
+            //we already know should be matching based of left side palindrome.
             i = newCenter;
             end = i + T[i]/2;
             start = i - T[i]/2;
