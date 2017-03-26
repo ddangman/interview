@@ -82,7 +82,7 @@ public class SuffixTree {
     private SuffixNode root;
     private Active active;
     private int remainingSuffixCount;
-    private End end;
+    private End end; // global end for leaf nodes
     private char input[];
     private static char UNIQUE_CHAR = '$';
     
@@ -124,12 +124,13 @@ public class SuffixTree {
             if(active.activeLength == 0){
                 //if current character from root is not null then increase active length by 1 
                 //and break out of while loop. This is rule 3 extension and trick 2 (show stopper)
-                if(selectNode(i) != null){
-                    active.activeEdge = selectNode(i).start;
-                    active.activeLength++;
+                if(selectNode(i) != null){ // valid node found from root
+                    active.activeEdge = selectNode(i).start; // track active edge
+                    active.activeLength++; // track position on active edge
                     break;
                 } //create a new leaf node with current character from leaf. This is rule 2 extension.
-                else {
+                else { // selectNode returned null, no next char match on edges
+                    // create new child node for root with char of interest
                     root.child[input[i]] = SuffixNode.createNode(i, end);
                     remainingSuffixCount--;
                 }
@@ -184,6 +185,7 @@ public class SuffixTree {
                             active.activeNode = active.activeNode.suffixLink;
                         }
                         //if active node is root then increase active index by one and decrease active length by 1
+                        // use this to locate next active point
                         else{
                             active.activeEdge = active.activeEdge  + 1;
                             active.activeLength--;
@@ -259,6 +261,8 @@ public class SuffixTree {
         return active.activeNode.child[input[active.activeEdge]];
     }
     
+    // check active node for path containing char at input[index]
+    // return valid node or null
     private SuffixNode selectNode(int index){
         return active.activeNode.child[input[index]];
     }
@@ -275,6 +279,7 @@ public class SuffixTree {
         
         val += root.end.end - root.start + 1;
         if(root.index != -1){
+            // index is size of input - edge length (# of char in to leaf node)
             root.index = size - val;
             return;
         }
@@ -379,12 +384,13 @@ class SuffixNode{
     private SuffixNode(){
     }
     
-    private static final int TOTAL = 256;
+    private static final int TOTAL = 256; // limit node to 256 edges
     SuffixNode[] child = new SuffixNode[TOTAL];
     
+    // edge range for nodes
     int start;
     End end;
-    int index;
+    int index; // array index indicating start of suffix, -1 for internal nodes
     
     SuffixNode suffixLink;
     
