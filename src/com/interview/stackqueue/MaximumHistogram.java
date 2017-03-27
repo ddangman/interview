@@ -23,13 +23,16 @@ import java.util.LinkedList;
  * if stack is empty 
  * it means that till this point value just removed has to be smallest element
  * so area = input[top] * i
+             (minimum height from start to index) * (index until height gets smaller)
  * if stack is not empty then this value at index top is less than or equal to 
  * everything from stack top + 1 till i. So area will
  * area = input[top] * (i - stack.peek() - 1);
+          maxHeight * (widthToIndex - widthToPreviousShorterIndex - 1 'removes the shorter index')
+          stack.peek removes the width before shorter index. -1 to actually remove the short index
  * Finally maxArea is area if area is greater than maxArea.
  * 
  * 
- * Time complexity is O(n)
+ * Time complexity is O(n), worst case: 2n
  * Space complexity is O(n)
  * 
  * References:
@@ -37,15 +40,17 @@ import java.util.LinkedList;
  */
 public class MaximumHistogram {
 
+    // input[] is bar graph, value is height at that index
     public int maxHistogram(int input[]){
         Deque<Integer> stack = new LinkedList<Integer>();
         int maxArea = 0;
         int area = 0;
         int i;
         for(i=0; i < input.length;){
+            // if heightAtIndex > heightAtTopOfStack, add index to stack
             if(stack.isEmpty() || input[stack.peekFirst()] <= input[i]){
                 stack.offerFirst(i++);
-            }else{
+            }else{ // height at current index <= height at top of stack
                 int top = stack.pollFirst();
                 //if stack is empty means everything till i has to be
                 //greater or equal to input[top] so get area by
@@ -53,7 +58,7 @@ public class MaximumHistogram {
                 if(stack.isEmpty()){
                     area = input[top] * i;
                 }
-                //if stack is not empty then everythin from i-1 to input.peek() + 1
+                //if stack is not empty then everything from i-1 to input.peek() + 1
                 //has to be greater or equal to input[top]
                 //so area = input[top]*(i - stack.peek() - 1);
                 else{
