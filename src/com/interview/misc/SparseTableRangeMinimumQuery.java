@@ -5,10 +5,15 @@ package com.interview.misc;
  * @author Tushar Roy
  *
  * Find range minimum query using sparse table.
+ * Sparse table row indicates start index, column indicates 2^c inclusive index range of input[]
+ * so value at sparse[r][c] is minimum value of input[r] to input[r + 2^c -1]
+ * -1 required for ending range to include starting index but exclude ending index
  *
  * Preprocessing Time complexity O(nlogn)
+     (n rows) * (logn +1 columns)
  * Query Time complexity O(1)
  * Space complexity O(nlogn)
+     (n rows) * (logn +1 columns)
  *
  * Reference -
  * https://www.topcoder.com/community/data-science/data-science-tutorials/range-minimum-query-and-lowest-common-ancestor/
@@ -25,18 +30,26 @@ public class SparseTableRangeMinimumQuery {
         this.sparse = preprocess(input, this.n);
     }
 
+    // n is length of input
     private int[][] preprocess(int[] input, int n) {
+        // holds input[index] of minimum value
         int[][] sparse = new int[n][log2(n) + 1];
-        for (int i = 0; i < input.length; i++) {
-            sparse[i][0] = i;
+        for (int r = 0; r < input.length; r++) {
+            // range == 2^0 = 1, no comparison needed for 1 element, just copy index
+            sparse[r][0] = r;
         }
 
-        for (int j = 1; 1 << j <= n; j++) {
-            for (int i = 0; i + (1 << j) - 1 < n; i++) {
-                if (input[sparse[i][j - 1]] < input[sparse[i + (1 << (j - 1))][j - 1]]) {
-                    sparse[i][j] = sparse[i][j - 1];
+        // Binary Left Shift 1 << c == 2^c
+        for (int c = 1; 1 << c <= n; c++) { // limit column range to n
+            // range is input[r] to input[r + 2^c -1]
+            // includes input[r] but excludes input[r + 2^c]
+            for (int r = 0; r + (1 << c) - 1 < n; r++) { // limit row + range under n
+                // store index of minimum value by comparing previously calculated values
+                // min(row through range, row+range through range)
+                if (input[sparse[r][c - 1]] < input[sparse[r + (1 << (c - 1))][c - 1]]) {
+                    sparse[r][c] = sparse[r][c - 1];
                 } else {
-                    sparse[i][j] = sparse[i + (1 << (j - 1))][j - 1];
+                    sparse[r][c] = sparse[r + (1 << (c - 1))][c - 1];
                 }
             }
         }
