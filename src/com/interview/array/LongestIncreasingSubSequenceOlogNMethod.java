@@ -21,7 +21,7 @@ public class LongestIncreasingSubSequenceOlogNMethod {
         int start = 0;
         int middle;
         int len = end;
-        while(start <= end){
+        while(start <= end){ //binary search
             middle = (start + end)/2;
             if(middle < len && input[T[middle]] < s && s <= input[T[middle+1]]){
                 return middle+1;
@@ -35,7 +35,14 @@ public class LongestIncreasingSubSequenceOlogNMethod {
     }
     
     public int longestIncreasingSubSequence(int input[]){
+        // index +1 = length of longest non-contiguous subsequence
+        // value at index is refers to input[index] holding minimum last number of that sequence length
+        // since multiple sequences of length T[index], keeping smallest last number will yield longest sequence
         int T[] = new int[input.length];
+        // since T[] stores the input[index] of last number of sequence
+        // R[] stores input[index] of previous number
+        // index here correlates to T[]value
+        // value here is input[index] of previous number in sequence
         int R[] = new int[input.length];
         for(int i=0; i < R.length ; i++) {
             R[i] = -1;
@@ -46,11 +53,12 @@ public class LongestIncreasingSubSequenceOlogNMethod {
             if(input[T[0]] > input[i]){ //if input[i] is less than 0th value of T then replace it there.
                 T[0] = i;
             }else if(input[T[len]] < input[i]){ //if input[i] is greater than last value of T then append it in T
-                len++;
-                T[len] = i;
-                R[T[len]] = T[len-1];
+                len++; //inc longest subsequence
+                T[len] = i; // store index
+                R[T[len]] = T[len-1]; // store index of previous number
             }else{ //do a binary search to find ceiling of input[i] and put it there.
                 int index = ceilIndex(input, T, len,input[i]);
+                // update arrays
                 T[index] = i;
                 R[T[index]] = T[index-1];
             }
