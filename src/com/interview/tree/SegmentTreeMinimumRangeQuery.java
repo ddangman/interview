@@ -5,12 +5,15 @@ import com.interview.bits.NextPowerOf2;
 /**
  * Date 08/22/2015
  * @author Tushar Roy
- * 
- * A segment tree is a tree data structure for storing intervals, or segments. It allows 
+ *
+ * A segment tree is a tree data structure for storing intervals, or segments. It allows
  * for faster querying (e.g sum or min) in these intervals. Lazy propagation is useful
  * when there are high number of updates in the input array.
 
  * Write a program to support mininmum range query
+ * Overlap is defined as query range overlapping segment range
+    so partial overlap means segment range is NOT completely contained within query range
+    total overlap means segment range is completely contained within query range
  * createSegmentTree(int arr[]) - create segment tree
  * query(int segment[], int startRange, int endRange) - returns minimum between startRange and endRange
  * update(int input[], int segment[], int indexToBeUpdated, int newVal) - updates input and segmentTree with newVal at index indexToBeUpdated;
@@ -28,7 +31,7 @@ import com.interview.bits.NextPowerOf2;
  * left child = 2i + 1
  * right child = 2i + 2
  * parent = ( i - 1 ) / 2
- * 
+ *
  * References
  * http://www.geeksforgeeks.org/segment-tree-set-1-sum-of-given-range/
  * http://www.geeksforgeeks.org/segment-tree-set-1-range-minimum-query/
@@ -41,19 +44,19 @@ public class SegmentTreeMinimumRangeQuery {
      */
     public int[] createSegmentTree(int input[]){
         NextPowerOf2 np2 = new NextPowerOf2();
-        //if input len is pow of 2 then size of 
+        //if input len is pow of 2 then size of
         //segment tree is 2*len - 1, otherwise
         //size of segment tree is next (pow of 2 for len)*2 - 1.
         int nextPowOfTwo = np2.nextPowerOf2(input.length);
         int segmentTree[] = new int[nextPowOfTwo*2 -1];
-        
+
         // pre-initialize segmentTree[] with maxInt
         for(int i=0; i < segmentTree.length; i++){
             segmentTree[i] = Integer.MAX_VALUE;
         }
         constructMinSegmentTree(segmentTree, input, 0, input.length - 1, 0);
         return segmentTree;
-        
+
     }
 
     /**
@@ -109,25 +112,25 @@ public class SegmentTreeMinimumRangeQuery {
         constructMinSegmentTree(segmentTree, input, low, mid, 2 * pos + 1);
         // recursion into right child after leftChild's recursion is done
         constructMinSegmentTree(segmentTree, input, mid + 1, high, 2 * pos + 2);
-        // store minimum value from left && right child, 
+        // store minimum value from left && right child into parent,
         // which is minimum value within input[ leftChildIndex - rightChildIndex ]
         segmentTree[pos] = Math.min(segmentTree[2*pos+1], segmentTree[2*pos+2]);
     }
-    
+
     private void updateSegmentTree(int segmentTree[], int index, int delta, int low, int high, int pos){
-       
+
         //if index to be updated is less than low or higher than high just return.
         if(index < low || index > high){
             return;
         }
-        
+
         //if low and high become equal, then index will be also equal to them and update
         //that value in segment tree at pos
         if(low == high){
             segmentTree[pos] += delta;
             return;
         }
-        //otherwise keep going left and right to find index to be updated 
+        //otherwise keep going left and right to find index to be updated
         //and then update current tree position if min of left or right has
         //changed.
         int mid = (low + high)/2; // cut range in half recursively
@@ -152,13 +155,13 @@ public class SegmentTreeMinimumRangeQuery {
         segmentTree[pos] = Math.min(segmentTree[2*pos+1], segmentTree[2*pos+2]);
     }
 
-    // segmentTree[]: array representing conceptual tree, 
+    // segmentTree[]: array representing conceptual tree,
     // low: lower range of input[] being queried, high: upper range of input[] being queried,
     // qlow: lower range being queried, qhigh: upper range being queried
     // pos: position on segmentTree[] corresponding to root of conceptual tree
     /* input[] no longer needed since segmentTree[] has all the data needed */
     private int rangeMinimumQuery(int segmentTree[],int low,int high,int qlow,int qhigh,int pos){
-        // total overlap, return minValue stored in node
+        // query range totally overlap (cover) segment range , return minValue stored in node
         if(qlow <= low && qhigh >= high){
             return segmentTree[pos];
         }
@@ -167,15 +170,15 @@ public class SegmentTreeMinimumRangeQuery {
             return Integer.MAX_VALUE;
         }
         // didn't meet above conditions; therefore, reaching this line means
-        // partial overlap
+        // query range partially overlaps tree segment
         int mid = (low+high)/2; // cut range in half recursively
         // return min( leftChildRecursion, rightChildRecursion )
         return Math.min(rangeMinimumQuery(segmentTree, low, mid, qlow, qhigh, 2 * pos + 1),
                 rangeMinimumQuery(segmentTree, mid + 1, high, qlow, qhigh, 2 * pos + 2));
     }
 
-    //segmentTree[]: array representing conceptual tree's minimum values for range, 
-    //lazy[]: array storing pending update to segmentTree[], 
+    //segmentTree[]: array representing conceptual tree's minimum values for range,
+    //lazy[]: array storing pending update to segmentTree[],
     // startRange - endRange: range of segmentTree to be updated,
     // delta: change to be applied, low - high: range of input[]
     // pos: position on segmentTree[] corresponding to root of conceptual tree
@@ -215,7 +218,7 @@ public class SegmentTreeMinimumRangeQuery {
             return;
         }
 
-        //otherwise partial overlap so look both left and right.
+        //otherwise query range partially overlap segment range so look both left and right.
         int mid = (low + high)/2; // cut range in half recursively
         // enter recursion with left child
         updateSegmentTreeRangeLazy(segmentTree, lazy, startRange, endRange,
@@ -227,8 +230,8 @@ public class SegmentTreeMinimumRangeQuery {
         segmentTree[pos] = Math.min(segmentTree[2*pos + 1], segmentTree[2*pos + 2]);
     }
 
-    //segmentTree[]: array representing conceptual tree's minimum values for range, 
-    //lazy[]: array storing pending update to segmentTree[], 
+    //segmentTree[]: array representing conceptual tree's minimum values for range,
+    //lazy[]: array storing pending update to segmentTree[],
     // qlow - qhigh: range of segmentTree being queried,
     // low - high: range of input[]
     // pos: position on segmentTree[] corresponding to root of conceptual tree
@@ -264,9 +267,9 @@ public class SegmentTreeMinimumRangeQuery {
             return segmentTree[pos];
         }
 
-        //partial overlap
+        // query range partially overlaps segment range
         // continue traversal of both branches, returning minimum value
-        int mid = (low+high)/2; 
+        int mid = (low+high)/2;
         return Math.min(rangeMinimumQueryLazy(segmentTree, lazy, qlow, qhigh,
                         low, mid, 2 * pos + 1),
                 rangeMinimumQueryLazy(segmentTree, lazy,  qlow, qhigh,

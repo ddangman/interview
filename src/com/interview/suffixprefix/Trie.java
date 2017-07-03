@@ -42,7 +42,7 @@ public class Trie {
                 nextNode = new TrieNode();
                 current.children.put(ch, nextNode);
             }
-            current = nextNode;
+            current = nextNode; // traverse to nextNode
         }
         //last character reached
         //mark the current nodes endOfWord as true
@@ -86,14 +86,14 @@ public class Trie {
             if (nextNode == null) {
                 return false;
             }
-            current = nextNode;
+            current = nextNode; // traverse to nextNode
         }
         //return true of current's endOfWord is true else return false.
         // if searching whole word match, boolean matters
         // when only checking prefix, completion of loop should return true
         return current.endOfWord;
     }
-    
+
         public boolean searchPrefix(String word) {
         TrieNode current = root;
         for (int i = 0; i < word.length(); i++) {
@@ -103,7 +103,7 @@ public class Trie {
             if (nextNode == null) {
                 return false;
             }
-            current = nextNode;
+            current = nextNode; // traverse to nextNode
         }
         // if searching whole word match, boolean matters
         // when only checking prefix, completion of loop should return true
@@ -153,7 +153,7 @@ public class Trie {
             current.endOfWord = false;
             //if current has no other mapping then return true
             // so calling function can delete this reference from their map
-            return current.children.size() == 0; 
+            return current.children.size() == 0;
         }
         char ch = word.charAt(index);
         TrieNode nextNode = current.children.get(ch);
@@ -168,7 +168,7 @@ public class Trie {
             current.children.remove(ch);
             //return true if no mappings are left in the map.
             // if this node has no other character, it will be deleted
-            return current.children.size() == 0; 
+            return current.children.size() == 0;
         }
         return false;
     }
