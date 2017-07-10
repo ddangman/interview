@@ -15,7 +15,9 @@ import java.util.Arrays;
 public class LongestIncreasingSubSequenceOlogNMethod {
 
     /**
-     * Returns index in T for ceiling of s
+     * Binary search works for T[] since it stores index of increasing values of
+     * input[]. Strictly increasing values are inherently sorted.
+     * Returns index in T for ceiling (next greater number) of s 
      */
     private int ceilIndex(int input[], int T[], int end, int s){
         int start = 0;
@@ -33,7 +35,7 @@ public class LongestIncreasingSubSequenceOlogNMethod {
         }
         return -1;
     }
-    
+
     public int longestIncreasingSubSequence(int input[]){
         // index +1 = length of longest non-contiguous subsequence
         // value at index is refers to input[index] holding minimum last number of that sequence length
@@ -53,7 +55,7 @@ public class LongestIncreasingSubSequenceOlogNMethod {
             if(input[T[0]] > input[i]){ //if input[i] is less than 0th value of T then replace it there.
                 T[0] = i;
             }else if(input[T[len]] < input[i]){ //if input[i] is greater than last value of T then append it in T
-                len++; //inc longest subsequence
+                len++; //increase longest subsequence
                 T[len] = i; // store index
                 R[T[len]] = T[len-1]; // store index of previous number
             }else{ //do a binary search to find ceiling of input[i] and put it there.
@@ -75,7 +77,7 @@ public class LongestIncreasingSubSequenceOlogNMethod {
         System.out.println();
         return len+1;
     }
-    
+
     public static void main(String args[]){
         //int input[] = {2,5,3,1,2,10,6,7,8};
         int input[] = {3, 4, -1, 5, 8, 2, 3, 12, 7, 9, 10};
