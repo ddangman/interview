@@ -60,12 +60,14 @@ public class StockBuySellKTransactions {
 
     /**
      * This is faster method which does optimization on slower method
+     * minCost is updated every loop instead of being calculated
+     * from zero up to current day
      * Time complexity here is O(K * number of days)
      *
      * Formula is
-     * T[i][j] = max(T[i][j-1], prices[j] + maxDiff)
-     * maxDiff = max(maxDiff, T[i-1][j] - prices[j])
-     * 
+     * T[t][d] = max(T[t][d-1], prices[d] + minCost)
+     * minCost = max(minCost, T[i-1][j] - prices[j])
+     *
      * K is maximum number of transaction
      */
     public int maxProfit(int prices[], int K) {
@@ -76,21 +78,23 @@ public class StockBuySellKTransactions {
         // rows are transactions
         // columns are days
         int T[][] = new int[K+1][prices.length];
-        /* Everything in a valid Java program not explicitly set 
+        /* Everything in a valid Java program not explicitly set
          * to something by the programmer, is initialized to a zero value.
          * row 0: 0 transaction yields 0 profit
          * column 0: no profit possible on 0th day */
         for (int t = 1; t < T.length; t++) { // t: transaction
             // initial best profit is buying on day 0, which is negative price
-            int bestPro = -prices[0]; //best profit possible
+            int minCost = -prices[0]; //best profit possible before current day
             for (int d = 1; d < T[0].length; d++) { // d: day
-                // T[t][d-1] is no transaction on dth day (value of prior day)
-                // prices[d] is profit if sold this day plus best prior profits 
-                T[t][d] = Math.max(T[t][d-1], prices[d] + bestPro); // fill matrix
-                // T[t-1][d] - prices[d] takes maxProfit of -1 transaction, 
-                // subtract price if bought this day and keep max
-                bestPro = Math.max(bestPro, T[t-1][d] - prices[d]); 
-            } // day increments so bestPro belongs to all days prior
+                // T[t][d-1] is no transaction on dth day (best of prior day)
+                // prices[d] is profit when sold this day plus best prior profits
+                T[t][d] = Math.max(T[t][d-1], prices[d] + minCost); // fill matrix
+                // T[t-1][d] - prices[d] takes minCost up to a given day with
+                // one less transaction subtracting that day's price (cost)
+                // at the end of each day, check if removing given day's cost
+                // improves minCost.
+                minCost = Math.max(minCost, T[t-1][d] - prices[d]);
+            } // day increments so minCost belongs to all days prior
         }
         printActualSolution(T, prices);
         return T[K][prices.length-1];
@@ -110,9 +114,10 @@ public class StockBuySellKTransactions {
         for (int t = 1; t < T.length; t++) {
             for (int d = 1; d < T[0].length; d++) {
                 int maxVal = 0;
-                for (int m = 0; m < d; m++) { 
-                    // buy on mth day, sell on dth day
-                    // plus best possible profit from transactions ending on day m
+                for (int m = 0; m < d; m++) {
+                    // profit = buy on mth day, sell on dth day
+                    // plus best possible profit from one less transactions
+                    // ending on day m (you cannot own more than one stock at a time)
                     maxVal = Math.max(maxVal, prices[d] - prices[m] + T[t-1][m]);
                 }
                 // max(no transaction on dth day, best profit with transaction on dth day)
@@ -134,14 +139,14 @@ public class StockBuySellKTransactions {
             }
             // find day when profit changes
             // this is where sell occurs
-            if (T[t][d] == T[t][d-1]) { 
+            if (T[t][d] == T[t][d-1]) {
                 d = d - 1;
             } else {
                 stack.addFirst(d); //save sell date
                 int bestPro = T[t][d] - prices[d];
                 for (int k = d-1; k >= 0; k--) {
                     // find where maxProfit - price == bestProfit
-                    if (T[t-1][k] - prices[k] == bestPro) { 
+                    if (T[t-1][k] - prices[k] == bestPro) {
                         t = t - 1; // move to previous transaction row
                         d = k;
                         stack.addFirst(d); //save purchase date
