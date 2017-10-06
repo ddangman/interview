@@ -10,10 +10,10 @@ import java.util.Map;
  * @author Tushar Roy
  *
  * Data structure to support following operations
- * extracMin - O(logn)
- * addToHeap - O(logn)
+ * extracMin - O(logN)
+ * addToHeap - O(logN)
  * containsKey - O(1)
- * decreaseKey - O(logn)
+ * decreaseKey - O(logN)
  * getKeyWeight - O(1)
  *
  * It is a combination of binary heap and hash map
@@ -23,7 +23,7 @@ public class BinaryMinHeap<T> {
 
     private List<Node> allNodes = new ArrayList<>();
     private Map<T,Integer> nodePosition = new HashMap<>();
-        
+
     public class Node {
         int weight;
         T key;
@@ -37,7 +37,8 @@ public class BinaryMinHeap<T> {
     }
 
     /**
-     * Add key and its weight to they heap
+     * Add key and its weight to the heap
+     * O(logN)
      */
     public void add(int weight,T key) {
         Node node = new Node();
@@ -65,6 +66,7 @@ public class BinaryMinHeap<T> {
 
     /**
      * Get the heap min without extracting the key
+     * O(1) time
      */
     public T min(){
         return allNodes.get(0).key;
@@ -79,6 +81,7 @@ public class BinaryMinHeap<T> {
 
     /**
      * Decreases the weight of given key to newWeight
+     * O(logN) time
      */
     public void decrease(T data, int newWeight){
         Integer position = nodePosition.get(data);
@@ -110,6 +113,7 @@ public class BinaryMinHeap<T> {
 
     /**
      * Returns the min node of the heap
+     * O(logN)
      */
     public Node extractMinNode() {
         int size = allNodes.size() -1;
@@ -162,10 +166,10 @@ public class BinaryMinHeap<T> {
     private void swap(Node node1,Node node2){
         int weight = node1.weight;
         T data = node1.key;
-        
+
         node1.key = node2.key;
         node1.weight = node2.weight;
-        
+
         node2.key = data;
         node2.weight = weight;
     }
@@ -176,13 +180,13 @@ public class BinaryMinHeap<T> {
         nodePosition.put(data1, pos1);
         nodePosition.put(data2, pos2);
     }
-    
+
     public void printHeap(){
         for(Node n : allNodes){
             System.out.println(n.weight + " " + n.key);
         }
     }
-    
+
     public static void main(String args[]){
         BinaryMinHeap<String> heap = new BinaryMinHeap<String>();
         heap.add(3, "Tushar");

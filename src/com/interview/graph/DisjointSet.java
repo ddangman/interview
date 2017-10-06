@@ -6,16 +6,16 @@ import java.util.Map;
 /**
  * @author tusroy
  * Date 06/20/2015
- *  
+ *
  * Video link - https://youtu.be/ID00PMy0-vE
- *  
+ *
  * Disjoint sets using path compression and union by rank
  * Supports 3 operations
  * 1) makeSet
  * 2) union
  * 3) findSet
- * 
- * For m operations and total n elements time complexity is O(m*f(n)) where f(n) is 
+ *
+ * For m operations and total n elements time complexity is O(m*f(n)) where f(n) is
  * very slowly growing function. For most cases f(n) <= 4 so effectively
  * total time will be O(m). Proof in Coreman book.
  */
@@ -26,7 +26,7 @@ public class DisjointSet {
     class Node {
         long data;
         Node parent;
-        int rank;
+        int rank; // depth of tree
     }
 
     /**
@@ -85,7 +85,7 @@ public class DisjointSet {
         if (parent == node) { //root points to itself
             return parent;
         }
-        // recursion returns parent to every node in recursion 
+        // recursion returns parent to every node in recursion
         node.parent = findSet(node.parent); // path compression
         return node.parent; // set all child-in-path's parent as root
     }

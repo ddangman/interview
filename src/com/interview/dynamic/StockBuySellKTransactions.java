@@ -14,6 +14,7 @@ import java.util.LinkedList;
  * Space complexity - O(number of transcations * number of days)
  *
  * https://leetcode.com/discuss/15153/a-clean-dp-solution-which-generalizes-to-k-transactions
+ * http://www.geeksforgeeks.org/maximum-profit-by-buying-and-selling-a-share-at-most-k-times/
  */
 public class StockBuySellKTransactions {
 
@@ -59,14 +60,14 @@ public class StockBuySellKTransactions {
     }
 
     /**
-     * This is faster method which does optimization on slower method
-     * minCost is updated every loop instead of being calculated
-     * from zero up to current day
+     * This is faster method which does optimization
+     * on slower method, balance is updated every loop
+     * instead of being calculated from zero up to current day
      * Time complexity here is O(K * number of days)
      *
      * Formula is
-     * T[t][d] = max(T[t][d-1], prices[d] + minCost)
-     * minCost = max(minCost, T[i-1][j] - prices[j])
+     * T[t][d] = max(T[t][d-1], prices[d] + balance)
+     * balance = max(balance, T[i-1][j] - prices[j])
      *
      * K is maximum number of transaction
      */
@@ -84,17 +85,17 @@ public class StockBuySellKTransactions {
          * column 0: no profit possible on 0th day */
         for (int t = 1; t < T.length; t++) { // t: transaction
             // initial best profit is buying on day 0, which is negative price
-            int minCost = -prices[0]; //best profit possible before current day
+            int balance = -prices[0]; //best profit possible before current day
             for (int d = 1; d < T[0].length; d++) { // d: day
                 // T[t][d-1] is no transaction on dth day (best of prior day)
-                // prices[d] is profit when sold this day plus best prior profits
-                T[t][d] = Math.max(T[t][d-1], prices[d] + minCost); // fill matrix
-                // T[t-1][d] - prices[d] takes minCost up to a given day with
+                // (prices[d] is profit when sold this day) plus best prior profits
+                T[t][d] = Math.max(T[t][d-1], prices[d] + balance); // fill matrix
+                // T[t-1][d] - prices[d] takes balance up to a given day with
                 // one less transaction subtracting that day's price (cost)
                 // at the end of each day, check if removing given day's cost
-                // improves minCost.
-                minCost = Math.max(minCost, T[t-1][d] - prices[d]);
-            } // day increments so minCost belongs to all days prior
+                // improves balance.
+                balance = Math.max(balance, T[t-1][d] - prices[d]);
+            } // day increments so balance belongs to all days prior
         }
         printActualSolution(T, prices);
         return T[K][prices.length-1];

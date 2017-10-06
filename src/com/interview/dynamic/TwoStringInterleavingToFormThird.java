@@ -6,6 +6,7 @@ package com.interview.dynamic;
  */
 public class TwoStringInterleavingToFormThird {
 
+    // O(2^n)
     public boolean isInterleavedRecursive(char str1[], char str2[], char str3[],int pos1, int pos2, int pos3){
         if(pos1 == str1.length && pos2 == str2.length && pos3 == str3.length){
             return true; // recursion successful
@@ -24,6 +25,7 @@ public class TwoStringInterleavingToFormThird {
                     && isInterleavedRecursive(str1, str2, str3, pos1, pos2+1, pos3+1));
         
     }
+    // dynamic programming time and space: O(A.length * B.length)
     // string C is interleaved string of A & B
     public boolean isInterleaved(char[] A, char[] B, char[] C){
         // A runs horizontally, B runs vertically
@@ -35,30 +37,31 @@ public class TwoStringInterleavingToFormThird {
             return false;
         }
         
-        for(int r=0; r < T.length; r++){ //fill matrix topRow down
-            for(int c=0; c < T[r].length; c++){ //fill matrix column left2right
-                int p = r + c -1; //p: position on C
+        // a: position of stringA, b: position of stringB
+        for(int a=0; a < T.length; a++){ //fill matrix topRow down 
+            for(int b=0; b < T[a].length; b++){ //fill matrix column left2right
+                int c = a + b -1; //c: position on C
                 // two empty strings have an empty string as interleaving
-                if(r == 0 && c == 0){
-                    T[r][c] = true;
+                if(a == 0 && b == 0){
+                    T[a][b] = true;
                 }
                 // A is empty
-                else if(r == 0){
-                    if(C[p] == B[c-1]){
-                        T[r][c] = T[r][c-1];
+                else if(a == 0){
+                    if(C[c] == B[b-1]){
+                        T[a][b] = T[a][b-1];
                     }
                 }
                 // B (column) is empty
-                else if(c == 0){
-                    if(A[r-1] == C[p]){
-                        T[r][c] = T[r-1][c];
+                else if(b == 0){
+                    if(A[a-1] == C[c]){
+                        T[a][b] = T[a-1][b];
                     }
                 }
                 else{
                     // charA matches charC ? check if previous charB is valid ||
                     // charB matches charC ? check if previous charA is valid
-                    T[r][c] = (A[r-1] == C[p] ? T[r-1][c] : false) 
-                            || (B[c-1] == C[p] ? T[r][c-1] : false);
+                    T[a][b] = (A[a-1] == C[c] ? T[a-1][b] : false) 
+                            || (B[b-1] == C[c] ? T[a][b-1] : false);
                 }
             }
         }

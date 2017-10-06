@@ -25,15 +25,15 @@ public class PalindromePartition {
 
         int[] cut = new int[str.length()];
         boolean isPal[][] = new boolean[str.length()][str.length()];
-        for (int i = 1; i < str.length(); i++) {
-            int min = i;
-            for (int j = 0; j <= i; j++) {
-                if (str.charAt(i) == str.charAt(j) && (i <= j + 1 || isPal[i - 1][j + 1])) {
-                    isPal[i][j] = true;
-                    min = Math.min(min, j == 0 ? 0 : 1 + cut[j - 1]);
+        for (int e = 1; e < str.length(); e++) {
+            int min = e;
+            for (int s = 0; s <= e; s++) {
+                if (str.charAt(e) == str.charAt(s) && (e <= s + 1 || isPal[e - 1][s + 1])) {
+                    isPal[e][s] = true;
+                    min = Math.min(min, s == 0 ? 0 : 1 + cut[s - 1]);
                 }
             }
-            cut[i] = min;
+            cut[e] = min;
         }
         return cut[str.length() - 1];
     }
