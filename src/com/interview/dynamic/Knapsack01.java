@@ -5,17 +5,18 @@ import java.util.Map;
 
 /**
  * Date 04/04/2014
+ *
  * @author Tushar Roy
  *
- * 0/1 Knapsack Problem - Given items of certain weights/values and maximum allowed weight
- * how to pick items to pick items from this set to maximize sum of value of items such that
- * sum of weights is less than or equal to maximum allowed weight.
+ * 0/1 Knapsack Problem - Given items of certain weights/values and maximum
+ * allowed weight how to pick items to pick items from this set to maximize sum
+ * of value of items such that sum of weights is less than or equal to maximum
+ * allowed weight.
  *
  * Time complexity - O(W*total items)
  *
- * Youtube link
- * Topdown DP - https://youtu.be/149WSzQ4E1g
- * Bottomup DP - https://youtu.be/8LusJS5-AGo
+ * Youtube link Topdown DP - https://youtu.be/149WSzQ4E1g Bottomup DP -
+ * https://youtu.be/8LusJS5-AGo
  *
  * References -
  * http://www.geeksforgeeks.org/dynamic-programming-set-10-0-1-knapsack-problem/
@@ -26,41 +27,42 @@ public class Knapsack01 {
     /**
      * Solves 0/1 knapsack in bottom up dynamic programming
      */
-    public int bottomUpDP(int val[], int wt[], int W){
-        int K[][] = new int[val.length+1][W+1];
-        for(int i=0; i <= val.length; i++){
-            for(int j=0; j <= W; j++){
-                if(i == 0 || j == 0){
-                    K[i][j] = 0;
-                    continue;
-                }
-                if(j - wt[i-1] >= 0){
-                    K[i][j] = Math.max(K[i-1][j], K[i-1][j-wt[i-1]] + val[i-1]);
-                }else{
-                    K[i][j] = K[i-1][j];
+    public int bottomUpDP(int val[], int wt[], int weight) {
+        int K[][] = new int[val.length + 1][weight + 1];
+        for (int v = 1; v <= val.length; v++) {
+            for (int w = 1; w <= weight; w++) {
+                if (w - wt[v - 1] >= 0) { // useable weight
+                    K[v][w] = Math.max(K[v - 1][w], K[v - 1][w - wt[v - 1]] + val[v - 1]);
+                } else {
+                    K[v][w] = K[v - 1][w];
                 }
             }
         }
-        return K[val.length][W];
+        return K[val.length][weight];
     }
 
     /**
      * Key for memoization
      */
     class Index {
+
         int remainingWeight;
         int remainingItems;
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) 
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
 
             Index index = (Index) o;
 
-            if (remainingWeight != index.remainingWeight) 
+            if (remainingWeight != index.remainingWeight) {
                 return false;
+            }
             return remainingItems == index.remainingItems;
             // key is valid if both remainingWeight && remainingItems are correct
         }
@@ -85,22 +87,22 @@ public class Knapsack01 {
     public int topDownRecursiveUtil(int values[], int weights[], int remainingWeight, int totalItems, int currentItem, Map<Index, Integer> map) {
         //if currentItem exceeds total item count or remainingWeight is less than 0 then
         //just return with 0;
-        if(currentItem >= totalItems || remainingWeight <= 0) {
+        if (currentItem >= totalItems || remainingWeight <= 0) {
             return 0;
         }
 
         //form a key based on remainingWeight and remainingCount
         Index key = new Index();
-        key.remainingItems = totalItems - currentItem -1;
+        key.remainingItems = totalItems - currentItem - 1;
         key.remainingWeight = remainingWeight;
 
         //see if key exists in map. If so then return the maximumValue for key stored in map.
-        if(map.containsKey(key)) {
+        if (map.containsKey(key)) {
             return map.get(key);
         }
         int maxValue;
         //if weight of item is more than remainingWeight then try next item by skipping current item
-        if(remainingWeight < weights[currentItem]) {
+        if (remainingWeight < weights[currentItem]) {
             maxValue = topDownRecursiveUtil(values, weights, remainingWeight, totalItems, currentItem + 1, map);
         } else {
             //try to get maximumValue of either by picking the currentItem or not picking currentItem
@@ -113,7 +115,7 @@ public class Knapsack01 {
 
     }
 
-    public static void main(String args[]){
+    public static void main(String args[]) {
         Knapsack01 k = new Knapsack01();
         int val[] = {22, 20, 15, 30, 24, 54, 21, 32, 18, 25};
         int wt[] = {4, 2, 3, 5, 5, 6, 9, 7, 8, 10};
