@@ -56,16 +56,16 @@ public class OptimalTreeSearch {
                 // Get column number j from row number i and chain length L
                 int j = i + L - 1;
                 cost[i][j] = Integer.MAX_VALUE;
-                // get sum of array elements freq[i] to freq[j]
+                // get summation of array elements freq[i] to freq[j]
                 int sum = getSum(freq, i, j);
 
                 // Try making all keys 'k' in interval keys[i..j] as root
                 for (int k = i; k <= j; k++) {
                     // val = value when when keys[k] becomes root of this subtree
                     int val = sum 
-                            + (k - 1 < i ? 0 : cost[i][k - 1]) //add nodes before key
-                            + (k + 1 > j ? 0 : cost[k + 1][j]); //add nodes after key
-                    if (val < cost[i][j]) { //keep best value
+                            + (k - 1 < i ? 0 : cost[i][k - 1]) //add range before key
+                            + (k + 1 > j ? 0 : cost[k + 1][j]); //add range after key
+                    if (val < cost[i][j]) { //keep best cost
                         cost[i][j] = val;
                     }
                 }
@@ -74,7 +74,7 @@ public class OptimalTreeSearch {
         return cost[0][keys.length - 1];
     }
 
-    // A utility function to get sum of array elements freq[i] to freq[j]
+    // A utility function to get summation of array elements freq[i] to freq[j]
     private int getSum(int[] freq, int i, int j) {
         int sum = 0;
         for (int x = i; x <= j; x++) {
